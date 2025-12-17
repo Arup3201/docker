@@ -1,0 +1,4 @@
+node_moduels/
+.Dockerignore
+.git
+.gitignore

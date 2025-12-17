@@ -18,4 +18,6 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 COPY --from=build-stage /goserve /goserve
 
+CMD ["/goserve"]
+
 EXPOSE 8080

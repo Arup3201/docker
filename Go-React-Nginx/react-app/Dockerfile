@@ -1,21 +1,35 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.4
 
-# Build Stage
-FROM node:18-alpine AS build
+FROM --platform=$BUILDPLATFORM node:lts AS development
 
-WORKDIR /app
+WORKDIR /code
+COPY package.json /code/package.json
+COPY package-lock.json /code/package-lock.json
 
-COPY package.json ./
+RUN npm ci
+COPY . /code
 
-RUN npm install
+CMD [ "npm", "start" ]
 
-COPY . .
+FROM development AS dev-envs
+RUN <<EOF
+apt-get update
+apt-get install -y git
+EOF
 
-RUN npm run build
+RUN <<EOF
+useradd -s /bin/bash -m vscode
+groupadd docker
+usermod -aG docker vscode
+EOF
+# install Docker tools (cli, buildx, compose)
+COPY --from=gloursdocker/docker / /
+CMD [ "npm", "start" ]
 
-# Production Stage
-FROM nginx:stable-alpine AS production
+FROM development AS build
 
-COPY --from=build /app/dist /usr/share/nginx/html
+RUN ["npm", "run", "build"]
 
-EXPOSE 80
+FROM nginx:1.13-alpine
+
+COPY --from=build /code/build /usr/share/nginx/html

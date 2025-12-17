@@ -1,15 +1,28 @@
 services:
   backend:
-    build: ./go-server
-    command: /goserve
+    build:
+      context: go-server
+    ports:
+      - "8080:8080"
 
   frontend:
-    build: ./react-app
-    command: nginx -g 'daemon off;'
+    build:
+      context: react-app
+      target: development
+    volumes:
+      - ./react-app:/app
+    ports:
+      - "5173:5173"
 
   proxy:
     image: nginx:mainline-alpine3.23-perl
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - type: bind
+        source: ./proxy/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
     ports:
       - 127.0.0.1:80:80
+    depends_on:
+      - backend
+      - frontend
