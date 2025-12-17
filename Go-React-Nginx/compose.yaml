@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: ./go-server
+    command: /goserve
+
+  frontend:
+    build: ./react-app
+    command: nginx -g 'daemon off;'
+
+  proxy:
+    image: nginx:mainline-alpine3.23-perl
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 127.0.0.1:80:80
