@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ApiResponse, User } from "./types.ts";
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = "http://localhost/api";
 
 function App() {
   const [health, setHealth] = useState<string>("");

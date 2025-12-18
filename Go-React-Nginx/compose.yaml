@@ -9,10 +9,16 @@ services:
     build:
       context: react-app
       target: development
-    volumes:
-      - ./react-app:/app
     ports:
       - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./react-app
+          target: /app
+          initial_sync: true
+          ignore:
+            - node_modules/
 
   proxy:
     image: nginx:mainline-alpine3.23-perl
